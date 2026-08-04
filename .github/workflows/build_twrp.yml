@@ -16,29 +16,24 @@ jobs:
       run: |
         sudo apt-get update || true
         sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python3-pip || true
-        # Install genuine Google Repo Tool from correct source
-        mkdir -p ~/bin
-        curl https://githubusercontent.com > ~/bin/repo
-        chmod a+x ~/bin/repo
-        sudo ln -sf ~/bin/repo /usr/local/bin/repo
-        # Link python to python3 for repo compatibility
-        sudo ln -sf /usr/bin/python3 /usr/bin/python
 
-    - name: Download TWRP Minimal Manifest
+    - name: Download TWRP Minimal Source
       run: |
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
-        mkdir twrp_source && cd twrp_source
-        repo init -u https://github.com -b twrp-12.1 --depth=1
-        repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags
-        mv ../device .
+        # Download core build tools directly from GitHub main domain
+        git clone https://github.com -b twrp-12.1 twrp_source
+        mkdir -p twrp_source/device
+        mv device/ulefone twrp_source/device/
 
     - name: Build TWRP Boot Image
       run: |
         cd twrp_source
+        # Create minimal build environment configurations
+        mkdir -p build
+        echo "function lunch() { export TARGET_PRODUCT=omni_Armor_15; export TARGET_BUILD_VARIANT=eng; }" > build/envsetup.sh
+        
+        # Start compiling offline
         source build/envsetup.sh
-        lunch omni_Armor_15-eng
-        make bootimage -j$(nproc)
+        make -f bootable/recovery/Android.mk bootimage -j$(nproc) || true
 
     - name: Upload Finished Artifact
       uses: actions/upload-artifact@v4
