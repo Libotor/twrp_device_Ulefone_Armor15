@@ -16,9 +16,16 @@ jobs:
       run: |
         sudo apt-get update || true
         sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev || true
+        # Install Google Repo Tool manually
+        mkdir -p ~/bin
+        curl https://googleapis.com > ~/bin/repo
+        chmod a+x ~/bin/repo
+        sudo ln -sf ~/bin/repo /usr/local/bin/repo
 
     - name: Download TWRP Minimal Manifest
       run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
         mkdir twrp_source && cd twrp_source
         repo init -u https://github.com -b twrp-12.1 --depth=1
         repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags
