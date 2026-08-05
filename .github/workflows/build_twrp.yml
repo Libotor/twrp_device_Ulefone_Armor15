@@ -17,24 +17,26 @@ jobs:
         sudo apt-get update || true
         sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev xz-utils || true
 
+    - name: Download Artifact From Release
+      uses: robinraju/release-downloader@v1.11
+      with:
+        # Hier sind jetzt deine echten Repository-Daten eingetragen:
+        repository: "Libotor/twrp_device_Ulefone_Armor15"
+        tag: "v1.0.0"
+        fileName: "MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz"
+
     - name: Extract Local Precompiled TWRP Source
       run: |
-        cd $HOME
-        mkdir twrp
-        
-        # Der Server holt sich deine Datei jetzt direkt von deiner eigenen Release-Seite ohne fremde Hürden
-        curl -LJ "https://github.com" -o $HOME/twrp.tar.xz
-        
-        # Jetzt läuft das Entpacken zu 100% ohne Formatfehler durch
-        tar -xJf $HOME/twrp.tar.xz --directory $HOME/twrp/
-        rm $HOME/twrp.tar.xz
+        mkdir -p twrp_source
+        tar -xJf MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz --directory twrp_source/
+        rm MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz
         
         # Verschiebe deinen hochgeladenen Device-Tree an die richtige Stelle im Quellcode
-        mv $GITHUB_WORKSPACE/device $HOME/twrp/
+        mv device twrp_source/
 
     - name: Build TWRP Image
       run: |
-        cd $HOME/twrp
+        cd twrp_source
         source build/envsetup.sh
         lunch omni_Armor_15-eng
         make -j$(nproc) bootimage
@@ -43,4 +45,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: TWRP-Boot-Image-Armor15
-        path: /home/runner/twrp/out/target/product/Armor_15/boot.img
+        path: twrp_source/out/target/product/Armor_15/boot.img
