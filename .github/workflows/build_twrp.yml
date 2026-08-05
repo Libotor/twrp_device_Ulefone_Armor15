@@ -29,20 +29,27 @@ jobs:
         mkdir -p twrp_source
         tar -xJf MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz --directory twrp_source/
         rm MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz
-        
-        # Pfad korrigiert: Erstellt die nötige Ordnerstruktur im Quellcode und verschiebt deine Dateien fehlerfrei
         mkdir -p twrp_source/device/ulefone/
         cp -r device/ulefone/Armor_15 twrp_source/device/ulefone/
 
     - name: Build TWRP Image
       run: |
         cd twrp_source
+        # Macht die Skripte im Quellcode für Linux ausführbar
+        chmod -R 755 build/tools/
+        chmod -R 755 bootable/recovery/
+        
+        # Initialisiert die Umgebung und startet den Build
         source build/envsetup.sh
         lunch omni_Armor_15-eng
-        make -j$(nproc) bootimage
+        
+        # Präziser Befehl für minimale Omni-Quellcodes
+        make -j$(nproc) recoveryimage || make -j$(nproc) bootimage
 
     - name: Upload Finished Artifact
       uses: actions/upload-artifact@v4
       with:
         name: TWRP-Boot-Image-Armor15
-        path: twrp_source/out/target/product/Armor_15/boot.img
+        path: |
+          twrp_source/out/target/product/Armor_15/boot.img
+          twrp_source/out/target/product/Armor_15/recovery.img
