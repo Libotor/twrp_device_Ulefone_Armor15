@@ -20,7 +20,6 @@ jobs:
     - name: Download Artifact From Release
       uses: robinraju/release-downloader@v1.11
       with:
-        # Hier sind jetzt deine echten Repository-Daten eingetragen:
         repository: "Libotor/twrp_device_Ulefone_Armor15"
         tag: "v1.0.0"
         fileName: "MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz"
@@ -31,8 +30,9 @@ jobs:
         tar -xJf MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz --directory twrp_source/
         rm MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz
         
-        # Verschiebe deinen hochgeladenen Device-Tree an die richtige Stelle im Quellcode
-        mv device twrp_source/
+        # Pfad korrigiert: Erstellt die nötige Ordnerstruktur im Quellcode und verschiebt deine Dateien fehlerfrei
+        mkdir -p twrp_source/device/ulefone/
+        cp -r device/ulefone/Armor_15 twrp_source/device/ulefone/
 
     - name: Build TWRP Image
       run: |
