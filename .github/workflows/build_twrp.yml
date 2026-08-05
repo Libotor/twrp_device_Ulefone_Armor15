@@ -20,7 +20,7 @@ jobs:
     - name: Download TWRP Minimal Source
       run: |
         # Download core build tools directly from GitHub main domain
-        git clone https://github.com -b twrp-12.1 twrp_source
+        git clone https://github.com/PhantomZone54/twrp_sources_norepo/releases/download/v3.3.1-20200222/MinimalOmniRecovery-twrp-6.0-norepo-20200222.tar.xz -b twrp-12.1 twrp_source
         mkdir -p twrp_source/device
         mv device/ulefone twrp_source/device/
 
